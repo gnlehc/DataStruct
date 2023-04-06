@@ -10,8 +10,8 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "cl.exe",
-            "intelliSenseMode": "windows-msvc-x64"
+            "compilerPath": "C:/MinGW/bin/cpp.exe",
+            "intelliSenseMode": "windows-clang-x64"
         },
         {
             "name": "kbhit",

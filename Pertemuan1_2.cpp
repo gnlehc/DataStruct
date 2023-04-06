@@ -23,6 +23,5 @@ int main(){
     x.age = 17;
     strcpy(x.name,"andi");
     x.score = 82.5;
-
     return 0;
 }
