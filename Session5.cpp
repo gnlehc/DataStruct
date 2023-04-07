@@ -37,9 +37,9 @@ node *insert(node *curr, int val){
 
 void inOrder(node *curr){
     if(curr){
-        inOrder(curr->left);
-        printf("%d\n", curr->val);
-        inOrder(curr->right);
+        inOrder(curr->left); // cek kiri
+        printf("%d\n", curr->val); // print
+        inOrder(curr->right); // cek kanan
     }
 }
 
@@ -130,7 +130,7 @@ int main(){
     root = insert(root, 17);
     root = insert(root, 7);
     root = insert(root, 8);
-    successor(root);
+    // successor(root);
     // root = pop(root, 12);
     // popAll(root);
     puts("");
