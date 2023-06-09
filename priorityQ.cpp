@@ -58,8 +58,10 @@ void removePriority() { // similar to popHead()
     free(first);
     first = last = NULL;
   } else {
-    Node *candidateFirst = first->next;
-    first->next = candidateFirst->prev = NULL;
+    Node *candidateFirst = first->next; // 1 2(first->next) 3 4
+    // candidateFirst nampung first->next
+    // first->next asli first->next tampungan di NULL-in
+    first->next = candidateFirst->prev = NULL; // 1 (candidateFirst->prev)2(first->next)3 4 5
     first = candidateFirst;
   }
 

@@ -1,125 +1,114 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-struct hospital
+#define size 20
+struct data
 {
     char name[40];
-    int age;
-    char syntp[40];
+    char desc[40];
     char code[40];
+    int age;
     int prior;
-    hospital *next, *prev;
-} *head, *tail;
+    data *next, *prev;
+} *head[size], *tail[size];
 
-hospital *newNode(char name[], int age, char syntp[], char code[])
+int hash(int prior)
 {
-    hospital *node = (hospital *)calloc(1, sizeof(hospital));
-    strcpy(node->name, name);
-    strcpy(node->syntp, syntp);
-    node->age = age;
-    int p = 0;
-    if (strcmp(code, "Red") == 0)
+    return prior % 100;
+}
+data *createNode(char name[], int age, char desc[], char code[])
+{
+    data *newNode = (data *)calloc(1, sizeof(data));
+    newNode->age = age;
+    strcpy(newNode->name, name);
+    strcpy(newNode->desc, desc);
+    int p;
+    if (strcmp(newNode->code, "Red") == 0)
     {
         p = 3;
     }
-    else if (strcmp(code, "Yellow") == 0)
+    else if (strcmp(newNode->code, "Yellow") == 0)
     {
         p = 2;
     }
-    else if (strcmp(code, "Green") == 0)
+    else if (strcmp(newNode->code, "Green") == 0)
     {
         p = 1;
     }
-    strcpy(node->code, code);
-    node->prior = p;
-    return node;
+    strcpy(newNode->code, code);
+    newNode->prior = p;
+    return newNode;
 }
 
-void pushHead(hospital *node)
+void pushHead(data *node)
 {
-    if (!head)
+    int key = hash(node->prior);
+    if (!head[key])
     {
-        head = tail = node;
+        head[key] = tail[key] = node;
     }
     else
     {
-        head->prev = node;
-        node->next = head;
-        head = node;
+        head[key]->prev = node;
+        node->next = head[key];
+        head[key] = node;
     }
 }
 
-void pushTail(hospital *node)
+void pushTail(data *node)
 {
-    if (head)
+    int key = hash(node->prior);
+    if (!head[key])
     {
-        head = tail = node;
+        head[key] = tail[key] = node;
     }
     else
     {
-        tail->next = node;
-        node->prev = tail;
-        tail = node;
+        tail[key]->next = node;
+        node->prev = tail[key];
+        tail[key] = node;
     }
 }
-// push mid
-void insert(hospital *node)
+
+void pushMid(data *node)
 {
-    hospital *curr;
-    hospital *prev;
-    if (!head)
+    int key = hash(node->prior);
+    if (!head[key])
     {
         pushHead(node);
     }
-    else if (head == tail)
+    else if (node->prior < tail[key]->prior)
     {
-        if (node->prior <= head->prior)
-        {
-            pushTail(node);
-        }
-        else
-        {
-            pushHead(node);
-        }
+        pushTail(node);
     }
     else
     {
-        curr = tail;
-        prev = NULL;
-        while (curr && curr->prior < node->prior)
+        data *curr = head[key];
+        data *temp = node;
+        while (curr->prior < node->prior)
         {
-            prev = curr;
             curr = curr->next;
         }
-        if (curr == tail)
-        {
-            pushTail(node);
-        }
-        else if (prev = head)
-        {
-            pushHead(node);
-        }
-        else
-        {
-            prev->next = node;
-            node->prev = prev;
-            curr->prev = node;
-            node->next = curr;
-        }
+
+        temp->prev = curr;
+        temp->next = curr->next;
+        curr->next->prev = temp;
+        curr->next = temp;
     }
 }
 
 void printQueue()
 {
-    hospital *curr = head;
+    data *curr;
+    int key = hash(curr->prior);
+    curr = head[key];
     puts("Prior List");
     puts("============");
     while (curr)
     {
         printf("Name: %s\n", curr->name);
         printf("Age: %d\n", curr->age);
-        printf("Description: %s\n", curr->syntp);
+        printf("Description: %s\n", curr->desc);
         printf("Code: %s\n", curr->code);
         printf("Prior: %d\n", curr->prior);
         curr = curr->next;
@@ -134,11 +123,11 @@ void menu()
     char syntp[40] = {0};
     int age = 0;
     char code[40] = {0};
-    puts("Hospital");
+    puts("BlueJack Hospital");
     puts("====================");
     puts("1. Insert");
     puts("2. View");
-    puts("3. Delete Queue");
+    puts("3. Next Queue");
     puts("4. Exit");
     printf(">>> ");
     scanf("%d", &chs);
@@ -158,7 +147,7 @@ void menu()
         printf("Input Your Code: ");
         scanf("%s", &code);
         getchar();
-        insert(newNode(name, age, syntp, code));
+        pushMid(createNode(name, age, syntp, code));
         printQueue();
         printf("Press Enter to continue...");
         getchar();
@@ -169,11 +158,6 @@ void menu()
         printf("Press Enter to continue...");
         getchar();
         system("cls");
-        break;
-    case 3:
-        break;
-    case 4:
-        exit(0);
         break;
     default:
         break;
