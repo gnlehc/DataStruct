@@ -7,7 +7,7 @@ struct itol
     char genre[255];
     int stock;
     int height, bf;
-    int key;
+    // int key;
     itol *left, *right;
 };
 
@@ -107,12 +107,12 @@ itol *createNode(char title[], char genre[], int stock)
     // for(int i = 0 ; i < strlen(root->title); i++){
     //     temp += root->title[i];
     // }
-    for (int j = 0; j < strlen(title); j++)
-    {
-        temp2 += title[j];
-    }
+    // for (int j = 0; j < strlen(title); j++)
+    // {
+    //     temp2 += title[j];
+    // }
 
-    node->key = temp2;
+    // node->key = temp2;
 
     node->right = node->left = NULL;
     return node;
@@ -174,9 +174,27 @@ itol *insert(itol *root, itol *data)
     // return root;
 }
 
-itol *updateNode(itol *root, itol *data)
+itol *updateNode(itol *root, char title[], int stock)
 {
-    
+    if (!root)
+    {
+        return root;
+    }
+    int cmp = strcmp(title, root->title);
+
+    if (cmp < 0)
+    {
+        root->left = updateNode(root->left, title, stock);
+    }
+    else if (cmp > 0)
+    {
+        root->right = updateNode(root->right, title, stock);
+    }
+    else
+    {
+        root->stock = stock;
+    }
+    return rotate(update(root));
 }
 
 bool search(itol *root, char title[])
@@ -200,6 +218,18 @@ bool search(itol *root, char title[])
     return false;
 }
 
+itol *deleteALL(itol *curr)
+{
+    if (!curr)
+    {
+        return NULL;
+    }
+    curr->left = deleteALL(curr->left);
+    curr->right = deleteALL(curr->right);
+    curr->right = curr->left = NULL;
+    free(curr);
+    curr = NULL;
+}
 
 void case1();
 void case2();
@@ -274,38 +304,55 @@ void case3()
 {
     char title[255];
     int stock = 0;
-    int chs = 0;
+    char chs[255] = {};
     printf("Input game title: ");
     scanf("%[^\n]", &title);
     getchar();
     if (search(root, title) == false)
     {
         puts("Data not found");
-    }
-
-    printf("Press enter to continue...");
-    getchar();
-    system("cls");
-    puts("1. Add new game");
-    puts("2. Update game");
-    printf("Choose between 2 options");
-    scanf("%d", &chs);
-    getchar();
-
-    switch (chs)
-    {
-    case 1:
-        case1();
-        break;
-    case 2:
-        printf("Enter the new stock: ");
-        scanf("%d", &stock);
+        printf("Press enter to continue...");
         getchar();
-        // root = insert(root)
-        break;
-    default:
-        break;
+        system("cls");
     }
+    else if (search(root, title))
+    {
+        // puts("1. Add new game");
+        // puts("2. Update game");
+        printf("Input update type[add][remove][case sensitive]: ");
+        scanf("%s", &chs);
+        getchar();
+
+        if (strcmp(chs, "add") == 0)
+        {
+            while (stock < 1 || stock > root->stock)
+            {
+                printf("Old Stock: %d\n", root->stock);
+                printf("Input Added Stock: ");
+                scanf("%d", &stock);
+                getchar();
+
+                root->stock += stock;
+            }
+        }
+        else if (strcmp(chs, "remove") == 0)
+        {
+            while (stock < 1 || stock > root->stock)
+            {
+                printf("Old Stock: %d\n", root->stock);
+                printf("Input Stock to remove[1-%d]: ", root->stock);
+                scanf("%d", &stock);
+                getchar();
+
+                root->stock -= stock;
+                if (root->stock == stock)
+                {
+                    root = deleteALL(root);
+                }
+            }
+        }
+    }
+
     Menu();
 }
 
